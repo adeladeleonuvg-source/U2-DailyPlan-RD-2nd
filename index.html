@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colegio Montano - Interactive Digital Whiteboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        montanoBlue: '#1269A8',
+                        montanoYellow: '#F7D615',
+                        montanoGreenish: '#54887D',
+                        montanoLightBlue: '#88B5C7',
+                        montanoLightOlive: '#A6B046',
+                        montanoSoftBg: '#F2F5E9',
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F2F5E9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .tab-active {
+            background-color: #1269A8 !important;
+            color: #FFFFFF !important;
+            border-bottom: 4px solid #F7D615;
+            font-weight: bold;
+        }
+        .week-active {
+            background-color: #F7D615 !important;
+            color: #1269A8 !important;
+            font-weight: bold;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .board-card {
+            background: #FFFFFF;
+            border: 2px solid #88B5C7;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-gray-800">
+
+    <!-- HEADER / NAVIGATION BAR -->
+    <header class="bg-montanoBlue text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-4">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyEop0yf6lZ7Jk9MILZxF1rBj4Oqs5esyhIQ&s" 
+                     alt="Colegio Montano Logo" 
+                     class="h-12 w-auto bg-white p-1 rounded-lg shadow-sm"
+                     onerror="this.src='https://placehold.co/120x50/1269A8/ffffff?text=Montano'">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-white">COLEGIO MONTANO</h1>
+                    <p class="text-xs md:text-sm text-montanoYellow font-semibold">Interactive Digital Whiteboard | Leader in Me School</p>
+                </div>
+            </div>
+
+            <!-- Class Info Banner -->
+            <div class="hidden lg:flex items-center space-x-6 bg-white/10 px-4 py-2 rounded-xl text-xs">
+                <div><span class="text-montanoYellow font-bold">Course:</span> Reading 2nd Grade</div>
+                <div><span class="text-montanoYellow font-bold">Teacher:</span> Nicole De León</div>
+                <div><span class="text-montanoYellow font-bold">Unit:</span> 2 (March 15 - May 7)</div>
+            </div>
+
+            <!-- Fullscreen Button -->
+            <button onclick="toggleFullScreen()" 
+                    class="bg-montanoYellow hover:bg-yellow-400 text-montanoBlue font-bold py-2 px-4 rounded-xl shadow-md transition flex items-center space-x-2 text-sm">
+                <i class="fa-solid fa-expand"></i>
+                <span>Fullscreen</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col space-y-6">
+
+        <!-- GENERAL METADATA CARD -->
+        <section class="board-card p-4 md:p-6 bg-white border-l-8 border-l-montanoBlue">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs md:text-sm">
+                <div><strong class="text-montanoBlue block">Subject:</strong> Reading</div>
+                <div><strong class="text-montanoBlue block">Grade:</strong> 2nd Grade</div>
+                <div><strong class="text-montanoBlue block">Teacher:</strong> Nicole De León</div>
+                <div><strong class="text-montanoBlue block">Book:</strong> Our World 2 (NatGeo)</div>
+                <div><strong class="text-montanoBlue block">Competency (CNB):</strong> Reads with age-appropriate fluency, accuracy, and comprehension to identify main ideas and key details.</div>
+                <div><strong class="text-montanoBlue block">Learning Outcome:</strong> Identifies house details, space routines, and environmental habits from texts.</div>
+                <div><strong class="text-montanoBlue block">Key Skills:</strong> Critical Thinking, Teamwork, Decision Making, Emotional Intelligence.</div>
+                <div><strong class="text-montanoBlue block">Leader in Me Habits:</strong> 1. Proactive, 2. End in Mind, 3. First Things First, 6. Synergize.</div>
+            </div>
+        </section>
+
+        <!-- WEEK SELECTOR NAV -->
+        <section class="flex flex-wrap gap-2 justify-center border-b border-gray-300 pb-2">
+            <button onclick="selectWeek(1)" id="week-btn-1" class="week-btn bg-white hover:bg-yellow-100 text-gray-700 py-2 px-4 rounded-lg font-semibold text-xs md:text-sm border transition">Week 1 (Mar 15-19)</button>
+            <button onclick="selectWeek(2)" id="week-btn-2" class="week-btn bg-white hover:bg-yellow-100 text-gray-700 py-2 px-4 rounded-lg font-semibold text-xs md:text-sm border transition">Week 2 (Mar 22-26)</button>
+            <button onclick="selectWeek(3)" id="week-btn-3" class="week-btn bg-white hover:bg-yellow-100 text-gray-700 py-2 px-4 rounded-lg font-semibold text-xs md:text-sm border transition">Week 3 (Apr 5-9)</button>
+            <button onclick="selectWeek(4)" id="week-btn-4" class="week-btn bg-white hover:bg-yellow-100 text-gray-700 py-2 px-4 rounded-lg font-semibold text-xs md:text-sm border transition">Week 4 (Apr 12-16)</button>
+            <button onclick="selectWeek(5)" id="week-btn-5" class="week-btn bg-white hover:bg-yellow-100 text-gray-700 py-2 px-4 rounded-lg font-semibold text-xs md:text-sm border transition">Week 5 (Apr 19-23)</button>
+            <button onclick="selectWeek(6)" id="week-btn-6" class="week-btn bg-white hover:bg-yellow-100 text-gray-700 py-2 px-4 rounded-lg font-semibold text-xs md:text-sm border transition">Week 6 (Apr 26-30)</button>
+            <button onclick="selectWeek(7)" id="week-btn-7" class="week-btn bg-white hover:bg-yellow-100 text-gray-700 py-2 px-4 rounded-lg font-semibold text-xs md:text-sm border transition">Week 7 (May 3-7)</button>
+        </section>
+
+        <!-- WEEK TITLE & DETAILS HEADER -->
+        <div id="week-header-info" class="bg-montanoGreenish text-white p-4 rounded-xl shadow flex justify-between items-center flex-wrap gap-2">
+            <div>
+                <h2 id="current-week-title" class="text-xl font-bold">Week 1: Fun Houses (Student Book pp. 72-74)</h2>
+                <p id="current-week-habit" class="text-xs text-montanoYellow font-medium"><i class="fa-solid fa-star mr-1"></i> Leader in Me Focus: Habit 1 - Be Proactive (Take initiative in warm-up)</p>
+            </div>
+            <div id="current-week-resources" class="text-xs bg-white/20 px-3 py-1.5 rounded-lg">
+                <i class="fa-solid fa-book-open mr-1"></i> Resources: SB pp. 72-74, Flashcards, Notebook
+            </div>
+        </div>
+
+        <!-- 4-MOMENTS PEDAGOGICAL TABS NAV -->
+        <section class="flex flex-wrap border-b border-gray-200 bg-white rounded-t-xl overflow-hidden shadow-sm">
+            <button onclick="selectTab(1)" id="tab-btn-1" class="tab-btn flex-1 py-3 px-4 text-center text-sm font-semibold text-gray-600 hover:bg-gray-100 transition">
+                <i class="fa-solid fa-bolt mr-2 text-yellow-500"></i>I) Warm-Up (~5 min)
+            </button>
+            <button onclick="selectTab(2)" id="tab-btn-2" class="tab-btn flex-1 py-3 px-4 text-center text-sm font-semibold text-gray-600 hover:bg-gray-100 transition">
+                <i class="fa-solid fa-user mr-2 text-blue-500"></i>II) Individual (~20 min)
+            </button>
+            <button onclick="selectTab(3)" id="tab-btn-3" class="tab-btn flex-1 py-3 px-4 text-center text-sm font-semibold text-gray-600 hover:bg-gray-100 transition">
+                <i class="fa-solid fa-users mr-2 text-green-500"></i>III) Teamwork (~30 min)
+            </button>
+            <button onclick="selectTab(4)" id="tab-btn-4" class="tab-btn flex-1 py-3 px-4 text-center text-sm font-semibold text-gray-600 hover:bg-gray-100 transition">
+                <i class="fa-solid fa-comments mr-2 text-purple-500"></i>IV) Plenary & Take-Home (~15 min)
+            </button>
+        </section>
+
+        <!-- TAB CONTENTS DISPLAY CONTAINER -->
+        <section class="board-card p-6 min-h-[350px] relative">
+
+            <!-- MOMENT 1 CONTENT -->
+            <div id="tab-content-1" class="tab-content space-y-4">
+                <div class="flex items-center space-x-3 text-montanoBlue">
+                    <i class="fa-solid fa-fire-flame-curved text-2xl text-montanoYellow"></i>
+                    <h3 class="text-lg font-bold">Moment 1: Warm-Up & Motivation (~5 minutes)</h3>
+                </div>
+                <p class="text-sm text-gray-600">Goal: Activate prior knowledge, review unit vocabulary, and spark curiosity for the lesson.</p>
+                <div id="m1-details" class="bg-montanoSoftBg p-4 rounded-xl border border-montanoLightBlue space-y-3">
+                    <!-- Dynamic Loading -->
+                </div>
+            </div>
+
+            <!-- MOMENT 2 CONTENT -->
+            <div id="tab-content-2" class="tab-content space-y-4 hidden">
+                <div class="flex items-center space-x-3 text-montanoBlue">
+                    <i class="fa-solid fa-brain text-2xl text-montanoLightBlue"></i>
+                    <h3 class="text-lg font-bold">Moment 2: Individual Work (~20 minutes)</h3>
+                </div>
+                <p class="text-sm text-gray-600">Goal: Independent reading comprehension, workbook exercise resolution, and individual reflection.</p>
+                <div id="m2-details" class="bg-montanoSoftBg p-4 rounded-xl border border-montanoLightBlue space-y-4">
+                    <!-- Dynamic Loading -->
+                </div>
+            </div>
+
+            <!-- MOMENT 3 CONTENT -->
+            <div id="tab-content-3" class="tab-content space-y-4 hidden">
+                <div class="flex items-center space-x-3 text-montanoBlue">
+                    <i class="fa-solid fa-people-holding-hands text-2xl text-montanoGreenish"></i>
+                    <h3 class="text-lg font-bold">Moment 3: Cooperative / Teamwork (~30 minutes)</h3>
+                </div>
+                <p class="text-sm text-gray-600">Goal: Structured peer collaboration with Leader in Me roles (Synergize - Habit 6).</p>
+                <div id="m3-details" class="bg-montanoSoftBg p-4 rounded-xl border border-montanoLightBlue space-y-3">
+                    <!-- Dynamic Loading -->
+                </div>
+            </div>
+
+            <!-- MOMENT 4 CONTENT -->
+            <div id="tab-content-4" class="tab-content space-y-4 hidden">
+                <div class="flex items-center space-x-3 text-montanoBlue">
+                    <i class="fa-solid fa-bullhorn text-2xl text-montanoYellow"></i>
+                    <h3 class="text-lg font-bold">Moment 4: Plenary & Take-Home Inquiry (~15 minutes)</h3>
+                </div>
+                <p class="text-sm text-gray-600">Goal: Synthesis of learning, peer feedback, interactive game/trivia, and take-home inquiry prompt.</p>
+                <div id="m4-details" class="bg-montanoSoftBg p-4 rounded-xl border border-montanoLightBlue space-y-4">
+                    <!-- Dynamic Loading -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- EVALUATION RUBRIC / CHECKLIST FOR PLENARY -->
+        <section class="board-card p-6 bg-white">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-montanoBlue flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-check text-montanoGreenish"></i>
+                    Interactive Plenary Assessment Checklist (Teacher Evaluation)
+                </h3>
+                <span class="text-xs bg-montanoLightBlue/20 text-montanoBlue font-semibold px-2.5 py-1 rounded-lg">Formative & Sumative</span>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs md:text-sm text-left text-gray-700 border-collapse">
+                    <thead class="bg-montanoBlue text-white uppercase text-xs">
+                        <tr>
+                            <th class="p-3 rounded-tl-lg">Criteria</th>
+                            <th class="p-3 text-center">Needs Work (1 pts)</th>
+                            <th class="p-3 text-center">Good (2 pts)</th>
+                            <th class="p-3 text-center rounded-tr-lg">Excellent (3 pts)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="p-3 font-semibold text-montanoBlue">1. Mastery & Reading Clarity</td>
+                            <td class="p-3 text-center"><input type="radio" name="c1" class="w-4 h-4 text-montanoBlue"> Needs guidance reading</td>
+                            <td class="p-3 text-center"><input type="radio" name="c1" class="w-4 h-4 text-montanoBlue"> Reads smoothly, minor errors</td>
+                            <td class="p-3 text-center"><input type="radio" name="c1" class="w-4 h-4 text-montanoBlue"> Clear pronunciation & fluency</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-semibold text-montanoBlue">2. Logic & Evidence from Text</td>
+                            <td class="p-3 text-center"><input type="radio" name="c2" class="w-4 h-4 text-montanoBlue"> Answers incomplete</td>
+                            <td class="p-3 text-center"><input type="radio" name="c2" class="w-4 h-4 text-montanoBlue"> Answers correctly with text support</td>
+                            <td class="p-3 text-center"><input type="radio" name="c2" class="w-4 h-4 text-montanoBlue"> Fully justifies answers using quotes/facts</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-semibold text-montanoBlue">3. Synergize & Equity in Team</td>
+                            <td class="p-3 text-center"><input type="radio" name="c3" class="w-4 h-4 text-montanoBlue"> Only 1 student spoke</td>
+                            <td class="p-3 text-center"><input type="radio" name="c3" class="w-4 h-4 text-montanoBlue"> Most members participated</td>
+                            <td class="p-3 text-center"><input type="radio" name="c3" class="w-4 h-4 text-montanoBlue"> Equal active participation & support</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-semibold text-montanoBlue">4. Response to Inquiry Prompt</td>
+                            <td class="p-3 text-center"><input type="radio" name="c4" class="w-4 h-4 text-montanoBlue"> Hesitant response</td>
+                            <td class="p-3 text-center"><input type="radio" name="c4" class="w-4 h-4 text-montanoBlue"> Good attempt at answering</td>
+                            <td class="p-3 text-center"><input type="radio" name="c4" class="w-4 h-4 text-montanoBlue"> Creative, insightful answers</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-montanoBlue text-white p-4 text-center text-xs mt-auto">
+        <p>© 2026 Colegio Montano - Formative Educational Model | "Leader in Me" Culture</p>
+    </footer>
+
+    <!-- JAVASCRIPT FOR DYNAMIC DATA AND INTERACTIVITY -->
+    <script>
+        // DATA STRUCTURE FOR THE 7 WEEKS (2 READINGS ACROSS 7 WEEKS)
+        const weeklyData = {
+            1: {
+                title: "Week 1: Reading 1 - Fun Houses (Part 1)",
+                bookRef: "Student Book Pages 72, 73, 74",
+                habit: "Habit 1: Be Proactive - Take the lead in warm-up vocabulary games!",
+                resources: "SB pp. 72-74, House Flashcards, Drawing Paper",
+                m1: {
+                    title: "Unit Vocabulary Warm-Up: House & Furniture Review",
+                    content: "Review Unit 1 & 2 Vocabulary using flashcards (kitchen, living room, bedroom, stone, egg house, grass, mountain). Play 'Vocabulary Speed Flash': Teacher shows picture, students raise hand proactive style to call out the name and spell it."
+                },
+                m2: {
+                    title: "Reading 'Fun Houses' (Stone House & Egg House - SB p.72)",
+                    content: "Students read independently about the Stone House in Portugal and the Egg House in China. Highlight key details (materials, rooms, unique facts). Complete Activity 2 (Matching) on page 73.",
+                    toggleTitle: "Show Activity 2 Answer Key",
+                    answer: "1. Dai Haifei's house is the shape of an -> egg.<br>2. His house is very -> small.<br>3. The stone house has -> a kitchen.<br>4. The stone house is on -> a mountain."
+                },
+                m3: {
+                    title: "Cooperative Work: Venn Diagram Comparison",
+                    content: "In pairs (Synergize - Habit 6), complete a Venn Diagram comparing the Stone House and Egg House using key facts. Student A reads facts about Stone House, Student B reads facts about Egg House."
+                },
+                m4: {
+                    title: "Plenary & Take-Home Inquiry Challenge",
+                    content: "Pairs share 1 difference and 1 similarity. Interactive Trivia: 'Would you rather live in an Egg House or a Stone House? Why?'",
+                    inquiry: "Take-Home Question: 'Look around your home or neighborhood: What unique material is used to build houses near you (wood, brick, stone, concrete)? Ask your parents!'"
+                }
+            },
+            2: {
+                title: "Week 2: Reading 1 - Welcome to Our Houses (Workbook Practice)",
+                bookRef: "Workbook Pages 50, 51, 52",
+                habit: "Habit 2: Begin with the End in Mind - Plan your writing before drawing!",
+                resources: "WB pp. 50-52, Colored Pencils",
+                m1: {
+                    title: "Vocabulary Warm-Up & Habit Focus",
+                    content: "Review key room & furniture terms (apartment, mobile home, shower, tub, sofa, rug, armchair). Game: 'Simon Says Point to the Room Item' (Point to lamp, bed, window)."
+                },
+                m2: {
+                    title: "Workbook Reading: 'Welcome to Our Houses' (WB p.50)",
+                    content: "Read about Alice's Apartment and Ben's Mobile Home. Answer true/false and short comprehension questions on WB p.51.",
+                    toggleTitle: "Show WB Page 51 Key",
+                    answer: "1. How many bedrooms in Alice's apartment? -> Two bedrooms.<br>2. Can Ben's parents drive the mobile home? -> Yes, they can.<br>3. Is the apartment in a building? -> Yes.<br>4. Is the mobile home in a building? -> No."
+                },
+                m3: {
+                    title: "Cooperative Writing & Drawing: My Dream Room (WB p.52)",
+                    content: "In pairs, choose a room from the box (armchair, bed, bookcase, fireplace, rug, etc.). Draw and write 3 descriptive sentences using 'There is / There are'."
+                },
+                m4: {
+                    title: "Gallery Walk & Take-Home Prompt",
+                    content: "Mini-exposition: Teams present their dream room drawings to neighboring pairs.",
+                    inquiry: "Take-Home Activity: 'Do a quick family survey: What is your family's favorite room in the house and why? Write 2 sentences in your journal.'"
+                }
+            },
+            3: {
+                title: "Week 3: Consolidation & Value - Help at Home",
+                bookRef: "Student Book Page 75",
+                habit: "Habit 3: Put First Things First - Help with chores at home before playtime!",
+                resources: "SB p. 75, Montano Values Chart",
+                m1: {
+                    title: "Vocabulary 1 & 2 Speed Challenge",
+                    content: "Combine all household vocabulary into a rapid-fire bingo game. Quick review of action verbs (clean, wash, cook, help)."
+                },
+                m2: {
+                    title: "Reading Value: 'Help at Home' (SB p.75)",
+                    content: "Individual reading on household chores and responsibilities. Self-reflection: List 3 chores you do at home every week."
+                },
+                m3: {
+                    title: "Think-Pair-Share Chores Chart",
+                    content: "Work in groups of 3. Discuss: 'How do you help your family?' Fill out the group chore commitment chart on poster paper.",
+                    toggleTitle: "Show Chores Guidance Ideas",
+                    answer: "Examples: Making the bed, picking up toys, setting the table, feeding pets."
+                },
+                m4: {
+                    title: "Plenary & Take-Home Responsibility Challenge",
+                    content: "Teams present 1 way they promise to synergize at home this week.",
+                    inquiry: "Take-Home Inquiry: 'Ask a grandparent or parent: What chores did children do at home 30 years ago? Compare with yours!'"
+                }
+            },
+            4: {
+                title: "Week 4: Reading 2 - A Day in the Space Station (Part 1)",
+                bookRef: "Student Book Pages 88, 89, 90",
+                habit: "Habit 4: Think Win-Win - Share space and cooperate like astronauts!",
+                resources: "SB pp. 88-90, Space Station Pictures",
+                m1: {
+                    title: "Space & Daily Routine Vocabulary Warm-Up",
+                    content: "Review Unit 2 Vocab: Astronaut, space station, experiments, space walk, suit. Match pictures with action verbs (get up, wash up, eat breakfast, exercise)."
+                },
+                m2: {
+                    title: "Reading Passage: 'A Day in the Space Station' (SB p.88)",
+                    content: "Silent reading about how astronauts live in zero gravity. Mark time expressions (7:00 AM, 8:00 AM, 1:00 PM, 10:00 PM). Complete True/False exercise.",
+                    toggleTitle: "Show SB Page 88 True/False Key",
+                    answer: "1. Astronauts aren't busy in the morning. -> False (F)<br>2. Space food is prepared on Earth. -> True (T)<br>3. The space station circles the Earth in 90 minutes. -> True (T)"
+                },
+                m3: {
+                    title: "Pair Work: Routine Timeline Graphic Organizer (SB p.89)",
+                    content: "In pairs, complete the morning, afternoon, and evening timeline for astronaut daily schedules."
+                },
+                m4: {
+                    title: "Space Routine Plenary & Take-Home Inquiry",
+                    content: "Direct Q&A: 'How is your morning routine different from an astronaut's morning routine?'",
+                    inquiry: "Take-Home Question: 'Research at home: How do astronauts sleep without floating away in space? Find out and tell us next class!'"
+                }
+            },
+            5: {
+                title: "Week 5: Reading 2 - A Day in the Space Station & Time Management",
+                bookRef: "Student Book Page 91 & WB Practice",
+                habit: "Habit 5: Seek First to Understand, Then to Be Understood - Listen to your partner's daily routine!",
+                resources: "SB p. 91, Time Clocks / Cards",
+                m1: {
+                    title: "Time & Schedule Vocabulary Drill",
+                    content: "Interactive clock warm-up: Set time on clocks for morning, afternoon, evening activities. Rapid oral vocabulary drill."
+                },
+                m2: {
+                    title: "Reading Value: 'Be on Time' (SB p.91)",
+                    content: "Read short text about planning your day and being punctual. Write responses to: 'What is your favorite day and why?'"
+                },
+                m3: {
+                    title: "Group Activity: Ideal Saturday Schedule",
+                    content: "In teams of 3, design an ideal balanced schedule incorporating study, play, and family time (Habit 3 & 7).",
+                    toggleTitle: "Show Sample Balanced Schedule",
+                    answer: "Morning: Breakfast & Chores | Afternoon: Reading & Sports | Evening: Family Movie Time."
+                },
+                m4: {
+                    title: "Plenary Presentation & Take-Home Prompt",
+                    content: "Teams share their schedules. Interactive game: 'Punctuality Charades'.",
+                    inquiry: "Take-Home Inquiry: 'Why is it important to be on time for school and sports? Ask an adult for 1 good reason.'"
+                }
+            },
+            6: {
+                title: "Week 6: Reading Extension - Dog Helps the Planet",
+                bookRef: "Workbook Pages 62, 63, 64",
+                habit: "Habit 6: Synergize - Work together with nature to protect our planet!",
+                resources: "WB pp. 62-64, Recycling Images",
+                m1: {
+                    title: "Environmental Vocabulary Warm-Up",
+                    content: "Review Unit 1 & 2 Vocabulary: Recycle, plastic bottles, park, clean, environment, dog. Flashcard speed match."
+                },
+                m2: {
+                    title: "Reading Passage: 'Tubby the Labrador' (WB p.62)",
+                    content: "Individual reading on Tubby, the dog that collects plastic bottles to recycle. Complete True/False & Venn Diagram on WB p.63.",
+                    toggleTitle: "Show WB Page 63 Key",
+                    answer: "1. Tubby goes to the park every day. -> True (T)<br>2. Tubby likes to play with a ball. -> False (F)<br>3. Tubby likes to pick up plastic bottles. -> True (T)"
+                },
+                m3: {
+                    title: "Partner Activity: My Daily Eco-Habits Writing (WB p.64)",
+                    content: "In pairs, complete the time of day writing chart selecting eco-friendly actions (e.g., picking up trash, saving water)."
+                },
+                m4: {
+                    title: "Plenary & Take-Home Action Challenge",
+                    content: "Teams present 1 eco-fact learned from Tubby the dog.",
+                    inquiry: "Take-Home Challenge: 'Count how many plastic bottles your family recycles this week! Bring the number to class next week!'"
+                }
+            },
+            7: {
+                title: "Week 7: Unit 2 Integrated Review & Celebration",
+                bookRef: "Student Book & Workbook Unit 2 Review",
+                habit: "Habit 7: Sharpen the Saw - Celebrate our learning, reflect, and rest!",
+                resources: "All SB & WB materials, Unit Certificates",
+                m1: {
+                    title: "Master Vocabulary Challenge (Units 1 & 2)",
+                    content: "Grand Vocabulary Relay Game: Combined vocabulary cards covering Fun Houses, Space Station, Chores, and Planet Care."
+                },
+                m2: {
+                    title: "Unit Portfolio Review & Self-Assessment",
+                    content: "Students review their reading logs, workbook pages (50-52, 62-64), and complete a self-reflection checklist on reading growth."
+                },
+                m3: {
+                    title: "Team Project: 'Our Class Book of Unique Stories'",
+                    content: "In teams of 4, assemble a mini poster integrating house design, astronaut routine, or eco-dog story created during the unit.",
+                    toggleTitle: "Show Project Guidelines",
+                    answer: "Must include: 1 Title, 2 Pictures, 4 Sentences using Unit Vocabulary."
+                },
+                m4: {
+                    title: "Grand Plenary, Interactive Pasapalabra Game & Home Final Inquiry",
+                    content: "Play a 10-question 'Pasapalabra / Trivia' game using all reading concepts.",
+                    inquiry: "Take-Home Inquiry: 'Share your complete Unit 2 reading portfolio with your parents today and tell them your favorite story!'"
+                }
+            }
+        };
+
+        let currentWeek = 1;
+
+        // SELECT WEEK FUNCTION
+        function selectWeek(weekNum) {
+            currentWeek = weekNum;
+            
+            // Update week buttons UI
+            document.querySelectorAll('.week-btn').forEach((btn, index) => {
+                if (index + 1 === weekNum) {
+                    btn.classList.add('week-active');
+                } else {
+                    btn.classList.remove('week-active');
+                }
+            });
+
+            // Update Header Details
+            const data = weeklyData[weekNum];
+            document.getElementById('current-week-title').innerText = data.title;
+            document.getElementById('current-week-habit').innerHTML = `<i class="fa-solid fa-star mr-1"></i> ${data.habit}`;
+            document.getElementById('current-week-resources').innerHTML = `<i class="fa-solid fa-book-open mr-1"></i> ${data.bookRef} | ${data.resources}`;
+
+            // Render Moments
+            renderMoments(data);
+
+            // Default back to Tab 1
+            selectTab(1);
+        }
+
+        // RENDER MOMENT CONTENT
+        function renderMoments(data) {
+            // Moment 1
+            document.getElementById('m1-details').innerHTML = `
+                <div class="font-bold text-montanoBlue text-base"><i class="fa-solid fa-play circle text-xs mr-2"></i>${data.m1.title}</div>
+                <p class="text-sm text-gray-700">${data.m1.content}</p>
+            `;
+
+            // Moment 2
+            document.getElementById('m2-details').innerHTML = `
+                <div class="font-bold text-montanoBlue text-base"><i class="fa-solid fa-book-reader mr-2"></i>${data.m2.title}</div>
+                <p class="text-sm text-gray-700">${data.m2.content}</p>
+                <button onclick="toggleAccordion('acc-m2')" class="bg-montanoLightBlue hover:bg-montanoBlue text-white text-xs font-bold py-1.5 px-3 rounded-lg transition flex items-center gap-2">
+                    <i class="fa-solid fa-key"></i> <span>${data.m2.toggleTitle}</span>
+                </button>
+                <div id="acc-m2" class="accordion-content bg-white p-3 rounded-lg border border-gray-200 text-xs text-gray-800 space-y-1">
+                    ${data.m2.answer}
+                </div>
+            `;
+
+            // Moment 3
+            let m3AnswerHtml = '';
+            if (data.m3.toggleTitle) {
+                m3AnswerHtml = `
+                    <button onclick="toggleAccordion('acc-m3')" class="bg-montanoGreenish hover:bg-montanoBlue text-white text-xs font-bold py-1.5 px-3 rounded-lg transition flex items-center gap-2 mt-2">
+                        <i class="fa-solid fa-lightbulb"></i> <span>${data.m3.toggleTitle}</span>
+                    </button>
+                    <div id="acc-m3" class="accordion-content bg-white p-3 rounded-lg border border-gray-200 text-xs text-gray-800 space-y-1 mt-1">
+                        ${data.m3.answer}
+                    </div>
+                `;
+            }
+
+            document.getElementById('m3-details').innerHTML = `
+                <div class="font-bold text-montanoBlue text-base"><i class="fa-solid fa-users mr-2"></i>${data.m3.title}</div>
+                <p class="text-sm text-gray-700">${data.m3.content}</p>
+                ${m3AnswerHtml}
+            `;
+
+            // Moment 4
+            document.getElementById('m4-details').innerHTML = `
+                <div class="font-bold text-montanoBlue text-base"><i class="fa-solid fa-comments mr-2"></i>${data.m4.title}</div>
+                <p class="text-sm text-gray-700">${data.m4.content}</p>
+                <div class="bg-montanoYellow/20 border-l-4 border-montanoYellow p-3 rounded-r-lg mt-2">
+                    <div class="font-bold text-xs text-montanoBlue uppercase"><i class="fa-solid fa-house-laptop mr-1"></i> Take-Home Inquiry Activity:</div>
+                    <p class="text-xs text-gray-800 font-medium mt-1">${data.m4.inquiry}</p>
+                </div>
+            `;
+        }
+
+        // SELECT TAB FUNCTION
+        function selectTab(tabNum) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            // Remove active classes
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+
+            // Show selected tab content and active styling
+            document.getElementById(`tab-content-${tabNum}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabNum}`).classList.add('tab-active');
+        }
+
+        // TOGGLE ACCORDION FOR HIDDEN SOLUTIONS
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = '0px';
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
+        }
+
+        // FULLSCREEN TOGGLE
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // INITIALIZE ON LOAD
+        window.onload = function() {
+            selectWeek(1);
+        };
+    </script>
+</body>
+</html>
